@@ -1,7 +1,7 @@
-using GamificationMVC.Models;
+using EduGameMVC.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GamificationMVC.Data
+namespace EduGameMVC.Data
 {
     public class ApplicationDbContext : DbContext
     {

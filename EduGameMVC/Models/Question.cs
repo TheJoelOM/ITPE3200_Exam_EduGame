@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace GamificationMVC.Models
+namespace EduGameMVC.Models
 {
     public class Question
     {

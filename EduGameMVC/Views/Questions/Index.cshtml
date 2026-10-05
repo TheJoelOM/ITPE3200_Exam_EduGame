@@ -1,0 +1,55 @@
+@model IEnumerable<EduGameMVC.Models.Question>
+
+@{
+    ViewData["Title"] = "Questions";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Questions</h1>
+
+    <a asp-action="Create" class="btn btn-primary">
+        Create Question
+    </a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th>Subject</th>
+            <th>Difficulty</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var question in Model)
+        {
+            <tr>
+                <td>@question.QuestionText</td>
+                <td>@question.Subject</td>
+                <td>@question.Difficulty</td>
+
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@question.Id"
+                       class="btn btn-sm btn-info">
+                        Details
+                    </a>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@question.Id"
+                       class="btn btn-sm btn-warning">
+                        Edit
+                    </a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@question.Id"
+                       class="btn btn-sm btn-danger">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
