@@ -17,7 +17,7 @@ namespace EduGameMVC.Controllers
             _logger = logger;
         }
 
-        // READ list all of the questions
+        // READ lists the questions
         public async Task<IActionResult> Index()
         {
             var questions = await _questionRepository.GetAllAsync();
