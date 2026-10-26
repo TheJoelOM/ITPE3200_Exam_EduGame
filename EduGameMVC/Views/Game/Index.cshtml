@@ -1,0 +1,59 @@
+
+@model EduGameMVC.Models.GameState
+
+@{
+    ViewData["Title"] = "Battle";
+}
+
+<h1>Battle Arena</h1>
+
+<div class="card p-4 mb-3">
+    <h2>Player</h2>
+    <p>Health: @Model.PlayerHealth / 100</p>
+    <p>Special Points: @Model.SpecialPoints</p>
+
+    <hr />
+
+    <h2>Enemy</h2>
+    <p>Health: @Model.EnemyHealth / 100</p>
+
+    @if (Model.GameOver)
+    {
+        if (Model.EnemyHealth <= 0)
+        {
+            <h3 class="text-success">Victory!</h3>
+        }
+        else
+        {
+            <h3 class="text-danger">Defeat!</h3>
+        }
+
+        <form asp-action="Restart" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">
+                Restart Battle
+            </button>
+        </form>
+    }
+    else
+    {
+        <form asp-action="Attack" method="post" class="d-flex gap-2">
+            @Html.AntiForgeryToken()
+
+            <button type="submit"
+                    name="attackType"
+                    value="Light"
+                    class="btn btn-primary">
+                Light Attack
+            </button>
+
+            <button type="submit"
+                    name="attackType"
+                    value="Heavy"
+                    class="btn btn-danger"
+                    disabled="@(Model.SpecialPoints < 3)">
+                Heavy Attack (3 SP)
+            </button>
+        </form>
+    }
+</div>

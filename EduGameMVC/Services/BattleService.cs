@@ -52,6 +52,14 @@ namespace EduGameMVC.Services
             CheckGameOver(game);
         }
 
+        public void AwardSpecialPoints(GameState game, int amount)
+        {
+            if (game.GameOver || amount <= 0)
+                return;
+
+            game.SpecialPoints += amount;
+        }
+
         private bool CanPlayerAct(GameState game) 
         {
             return !game.GameOver
