@@ -38,23 +38,86 @@ namespace EduGameMVC.Controllers
             if (game == null)
                 return RedirectToAction(nameof(Index));
 
-            if (attackType == "Light")
+            // Reject actions while the enemy's turn is in progress.
+            if (game.GameOver || game.EnemyTurnPending || game.EnemyAttackPending)
+                return RedirectToAction(nameof(Index));
+
+            game.PreviousEnemyHealth = game.EnemyHealth;
+
+            bool succeeded = attackType switch
             {
-                _battleService.LightAttack(game);
-            }
-            else if (attackType == "Heavy")
+                "Light" => _battleService.LightAttack(game),
+                "Heavy" => _battleService.HeavyAttack(game),
+                _ => false
+            };
+
+            if (!succeeded)
             {
-                _battleService.HeavyAttack(game);
+                SaveGame(game);
+                return RedirectToAction(nameof(Index));
             }
 
-            // If the enemy was defeated, it cannot attack.
-            if (!game.GameOver)
+            game.BattleMessage = attackType == "Light"
+                ? "You used Light Attack!"
+                : "You used Heavy Attack!";
+
+            if (game.GameOver)
             {
-                _battleService.EnemyAttack(game);
+                game.BattleMessage = "Victory!";
+            }
+            else
+            {
+                game.EnemyTurnPending = true;
             }
 
             SaveGame(game);
+            return RedirectToAction(nameof(Index));
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EnemyTurn()
+        {
+            var game = LoadGame();
+
+            if (game == null)
+                return RedirectToAction(nameof(Index));
+
+            // Only announce an enemy move after a valid player action.
+            if (game.GameOver || !game.EnemyTurnPending || game.EnemyAttackPending)
+                return RedirectToAction(nameof(Index));
+
+            game.BattleMessage = "The enemy uses Basic Attack!";
+            game.EnemyAttackPending = true;
+
+            SaveGame(game);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ResolveEnemyAttack()
+        {
+            var game = LoadGame();
+
+            if (game == null)
+                return RedirectToAction(nameof(Index));
+
+            if (game.GameOver || !game.EnemyTurnPending || !game.EnemyAttackPending)
+                return RedirectToAction(nameof(Index));
+
+            game.PreviousPlayerHealth = game.PlayerHealth;
+
+            _battleService.EnemyAttack(game);
+
+            game.EnemyAttackPending = false;
+            game.EnemyTurnPending = false;
+
+            game.BattleMessage = game.GameOver
+                ? "Defeat!"
+                : "Choose your move!";
+
+            SaveGame(game);
             return RedirectToAction(nameof(Index));
         }
 

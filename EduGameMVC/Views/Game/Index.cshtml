@@ -10,12 +10,39 @@
 <div class="card p-4 mb-3">
     <h2>Player</h2>
     <p>Health: @Model.PlayerHealth / 100</p>
+
+    <div class="progress mb-3" role="progressbar"
+         aria-label="Player health"
+         aria-valuenow="@Model.PlayerHealth"
+         aria-valuemin="0" aria-valuemax="100">
+        <div id="playerHealthBar"
+             class="progress-bar bg-success"
+             style="width: @(Model.PreviousPlayerHealth)%"
+             data-target="@Model.PlayerHealth">
+        </div>
+    </div>
+
     <p>Special Points: @Model.SpecialPoints</p>
 
     <hr />
 
     <h2>Enemy</h2>
     <p>Health: @Model.EnemyHealth / 100</p>
+
+    <div class="progress mb-3" role="progressbar"
+         aria-label="Enemy health"
+         aria-valuenow="@Model.EnemyHealth"
+         aria-valuemin="0" aria-valuemax="100">
+        <div id="enemyHealthBar"
+             class="progress-bar bg-danger"
+             style="width: @(Model.PreviousEnemyHealth)%"
+             data-target="@Model.EnemyHealth">
+        </div>
+    </div>
+
+    <p id="battleMessage" aria-live="polite">
+        @Model.BattleMessage
+    </p>
 
     @if (Model.GameOver)
     {
@@ -35,7 +62,7 @@
             </button>
         </form>
     }
-    else
+    else if (!Model.EnemyTurnPending && !Model.EnemyAttackPending)
     {
         <form asp-action="Attack" method="post" class="d-flex gap-2">
             @Html.AntiForgeryToken()
@@ -56,4 +83,80 @@
             </button>
         </form>
     }
+    else
+    {
+        <p>Please wait for the enemy's turn to finish...</p>
+    }
 </div>
+
+@if (!Model.GameOver)
+{
+    <form id="enemyTurnForm" asp-action="EnemyTurn" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <form id="resolveEnemyForm" asp-action="ResolveEnemyAttack" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+    </form>
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const playerBar = document.getElementById("playerHealthBar");
+        const enemyBar = document.getElementById("enemyHealthBar");
+
+        function animateHealthBar(bar) {
+            if (!bar) return Promise.resolve();
+
+            const target = Number(bar.dataset.target);
+            bar.style.transition = "width 900ms linear";
+
+            return new Promise(resolve => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        bar.style.width = `${target}%`;
+                    });
+                });
+
+                window.setTimeout(resolve, 950);
+            });
+        }
+
+        async function runBattleSequence() {
+            // Animate the player's attack against the enemy.
+            await animateHealthBar(enemyBar);
+
+            const enemyTurnForm = document.getElementById("enemyTurnForm");
+            const resolveEnemyForm = document.getElementById("resolveEnemyForm");
+
+            if (enemyTurnForm) {
+                // Announce the enemy's move before resolving its damage.
+                enemyTurnForm.requestSubmit();
+                return;
+            }
+
+            if (resolveEnemyForm) {
+                // The next page load announces the attack; animate the
+                // player's health after the server resolves the damage.
+                resolveEnemyForm.requestSubmit();
+            }
+        }
+
+        const enemyTurnPending = @Model.EnemyTurnPending.ToString().ToLower();
+        const enemyAttackPending = @Model.EnemyAttackPending.ToString().ToLower();
+
+        if (enemyAttackPending) {
+            // The enemy attack has been announced on this page.
+            window.setTimeout(() => {
+                document.getElementById("resolveEnemyForm")?.requestSubmit();
+            }, 1000);
+        } else if (enemyTurnPending) {
+            // The player's attack has resolved. Animate the enemy health,
+            // then ask the server to announce the enemy's move.
+            runBattleSequence();
+        } else {
+            // Animate any player health change from the previous enemy turn.
+            animateHealthBar(playerBar);
+        }
+    });
+</script>

@@ -12,23 +12,24 @@ namespace EduGameMVC.Services
             return new GameState();
         }
 
-        public void LightAttack(GameState game)
+                public bool LightAttack(GameState game)
         {
             if (!CanPlayerAct(game))
-                return;
+                return false;
 
             int damage = Random.Shared.Next(6, 12);
             game.EnemyHealth -= damage;
 
             CheckGameOver(game);
+            return true;
         }
 
-        public bool HeavyAttack(GameState game) 
+        public bool HeavyAttack(GameState game)
         {
             if (!CanPlayerAct(game))
                 return false;
 
-            if (game.SpecialPoints < HeavyAttackCost) // this move requires sp
+            if (game.SpecialPoints < HeavyAttackCost)
                 return false;
 
             game.SpecialPoints -= HeavyAttackCost;
@@ -37,7 +38,6 @@ namespace EduGameMVC.Services
             game.EnemyHealth -= damage;
 
             CheckGameOver(game);
-
             return true;
         }
 
