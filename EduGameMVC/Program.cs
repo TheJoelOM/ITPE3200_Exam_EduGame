@@ -1,6 +1,7 @@
 using EduGameMVC.Data;
 using Microsoft.EntityFrameworkCore;
 using EduGameMVC.Repositories;
+using EduGameMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+
+builder.Services.AddScoped<BattleService>();
 
 var app = builder.Build();
 
