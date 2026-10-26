@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 
 builder.Services.AddScoped<BattleService>();
+builder.Services.AddSession();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
