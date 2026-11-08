@@ -29,3 +29,153 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.battle-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.battle-title {
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.battle-scene {
+  position: relative;
+  min-height: 420px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 4px solid #263238;
+  border-radius: 16px;
+  background-image: url("/images/game/TurnbasedGame_background.png");
+  background-position: center;
+  background-size: cover;
+  image-rendering: pixelated;
+}
+
+.battle-status {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.battle-status-card {
+  width: min(260px, 42%);
+  padding: 0.75rem 1rem;
+  color: white;
+  background: rgb(20 28 35 / 82%);
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+}
+
+.battle-status-card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+}
+
+.battle-status-card p {
+  margin-bottom: 0.4rem;
+}
+
+.battle-status-card .progress {
+  height: 14px;
+  background-color: #343a40;
+}
+
+.special-points {
+  margin-top: 0.55rem;
+  margin-bottom: 0;
+}
+
+.battle-character {
+  position: absolute;
+  z-index: 1;
+  bottom: 2%;
+  width: auto;
+  height: 54%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 8px 5px rgb(0 0 0 / 35%));
+}
+
+.player-character {
+  left: 17%;
+}
+
+.monster-character {
+  right: 17%;
+  height: 58%;
+}
+
+.battle-controls {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  text-align: center;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+}
+
+.battle-message {
+  margin-bottom: 1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.battle-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .battle-scene {
+    min-height: 440px;
+    aspect-ratio: auto;
+    background-position: center;
+  }
+
+  .battle-status {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    gap: 0.5rem;
+  }
+
+  .battle-status-card {
+    width: 50%;
+    padding: 0.6rem;
+  }
+
+  .battle-status-card h2 {
+    font-size: 1rem;
+  }
+
+  .battle-status-card p {
+    font-size: 0.85rem;
+  }
+
+  .battle-character {
+    bottom: 5%;
+    height: 38%;
+  }
+
+  .player-character {
+    left: 7%;
+  }
+
+  .monster-character {
+    right: 7%;
+    height: 42%;
+  }
+
+  .battle-actions {
+    flex-direction: column;
+  }
+}
