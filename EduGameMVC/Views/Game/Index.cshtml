@@ -4,16 +4,38 @@
     ViewData["Title"] = "Battle";
 }
 
-<div class="battle-page">
-    <h1 class="battle-title">Battle Arena</h1>
+<main class="battle-page">
+    <section class="battle-stage" aria-label="Battle scene">
+        <div class="card battle-status monster-status">
+            <div class="d-flex justify-content-between">
+                <strong>MONSTER</strong>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="small text-warning fw-bold">HP</span>
+                <div class="progress flex-grow-1"
+                     role="progressbar"
+                     aria-label="Monster health"
+                     aria-valuenow="@Model.EnemyHealth"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                    <div id="enemyHealthBar"
+                         class="progress-bar bg-success"
+                         style="width: @(Model.PreviousEnemyHealth)%"
+                         data-target="@Model.EnemyHealth">
+                    </div>
+                </div>
+            </div>
+            @if (Model.EnemyPoisonTurnsRemaining > 0)
+            {
+                <small>Poisoned · @Model.EnemyPoisonTurnsRemaining turns</small>
+            }
+        </div>
 
-    <section class="battle-scene" aria-label="Battle scene">
-        <div class="battle-status">
-            <div class="battle-status-card">
-                <h2>Player</h2>
-                <p>Health: @Model.PlayerHealth / 100</p>
-
-                <div class="progress"
+        <div class="card battle-status player-status">
+            <strong>PLAYER</strong>
+            <div class="d-flex align-items-center gap-2">
+                <span class="small text-warning fw-bold">HP</span>
+                <div class="progress flex-grow-1"
                      role="progressbar"
                      aria-label="Player health"
                      aria-valuenow="@Model.PlayerHealth"
@@ -25,95 +47,88 @@
                          data-target="@Model.PlayerHealth">
                     </div>
                 </div>
-
-                <p class="special-points">Special Points: @Model.SpecialPoints</p>
             </div>
-
-            <div class="battle-status-card enemy-status">
-                <h2>Monster</h2>
-                <p>Health: @Model.EnemyHealth / 100</p>
-
-                <div class="progress"
-                     role="progressbar"
-                     aria-label="Monster health"
-                     aria-valuenow="@Model.EnemyHealth"
-                     aria-valuemin="0"
-                     aria-valuemax="100">
-                    <div id="enemyHealthBar"
-                         class="progress-bar bg-danger"
-                         style="width: @(Model.PreviousEnemyHealth)%"
-                         data-target="@Model.EnemyHealth">
-                    </div>
-                </div>
-            </div>
+            <small>
+                SP @Model.SpecialPoints
+                @if (Model.BlockNextAttack)
+                {
+                    <span> · Block ready</span>
+                }
+            </small>
         </div>
 
-        <img class="battle-character player-character"
+        <img class="battle-character battle-monster"
+             src="~/images/game/Enemy1.png"
+             alt="Sunflower monster" />
+
+        <img class="battle-character battle-player"
              src="~/images/game/Player.png"
              alt="Player character" />
 
-        <img class="battle-character monster-character"
-             src="~/images/game/Enemy1.png"
-             alt="Monster" />
-    </section>
+        <section class="battle-command-panel" aria-label="Battle commands">
+            <div class="card battle-dialogue">
+                <p id="battleMessage" aria-live="polite">@Model.BattleMessage</p>
 
-    <section class="battle-controls">
-        <p id="battleMessage" class="battle-message" aria-live="polite">
-            @Model.BattleMessage
-        </p>
+                @if (Model.GameOver)
+                {
+                    <h2 class="h5 @(Model.EnemyHealth <= 0 ? "text-success" : "text-danger")">
+                        @(Model.EnemyHealth <= 0 ? "Victory!" : "Defeat!")
+                    </h2>
+                    <form asp-action="Restart" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary btn-sm">Play again</button>
+                    </form>
+                }
+                else if (Model.EnemyTurnPending || Model.EnemyAttackPending)
+                {
+                    <small>Waiting for the monster...</small>
+                }
+                else
+                {
+                    <small>Choose a move.</small>
+                }
+            </div>
 
-        @if (Model.GameOver)
-        {
-            if (Model.EnemyHealth <= 0)
+            @if (!Model.GameOver &&
+                 !Model.EnemyTurnPending &&
+                 !Model.EnemyAttackPending)
             {
-                <h2 class="text-success">Victory!</h2>
+                <form asp-action="Attack" method="post" class="card battle-move-menu">
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" name="move" value="Light">
+                        <span class="move-cursor">▶</span><span>Light Attack</span><small>0 SP</small>
+                    </button>
+                    <button type="submit" name="move" value="Heavy"
+                            disabled="@(Model.SpecialPoints < 3)">
+                        <span class="move-cursor">▶</span><span>Heavy Attack</span><small>3 SP</small>
+                    </button>
+                    <button type="submit" name="move" value="Block">
+                        <span class="move-cursor">▶</span><span>Block</span><small>0 SP</small>
+                    </button>
+                    <button type="submit" name="move" value="Heal"
+                            disabled="@(Model.SpecialPoints < 12 || Model.PlayerHealth >= 100)">
+                        <span class="move-cursor">▶</span><span>Heal</span><small>12 SP</small>
+                    </button>
+                    <button type="submit" name="move" value="Fireball"
+                            disabled="@(Model.SpecialPoints < 10)">
+                        <span class="move-cursor">▶</span><span>Fireball</span><small>10 SP</small>
+                    </button>
+                    <button type="submit" name="move" value="Poison"
+                            disabled="@(Model.SpecialPoints < 8)">
+                        <span class="move-cursor">▶</span><span>Poison</span><small>8 SP</small>
+                    </button>
+                </form>
             }
-            else
-            {
-                <h2 class="text-danger">Defeat!</h2>
-            }
-
-            <form asp-action="Restart" method="post">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-primary">
-                    Restart Battle
-                </button>
-            </form>
-        }
-        else if (!Model.EnemyTurnPending && !Model.EnemyAttackPending)
-        {
-            <form asp-action="Attack" method="post" class="battle-actions">
-                @Html.AntiForgeryToken()
-
-                <button type="submit"
-                        name="attackType"
-                        value="Light"
-                        class="btn btn-primary">
-                    Light Attack
-                </button>
-
-                <button type="submit"
-                        name="attackType"
-                        value="Heavy"
-                        class="btn btn-danger"
-                        disabled="@(Model.SpecialPoints < 3)">
-                    Heavy Attack (3 SP)
-                </button>
-            </form>
-        }
-        else
-        {
-            <p>Please wait for the monster's turn to finish...</p>
-        }
+        </section>
     </section>
-</div>
+</main>
 
 @if (!Model.GameOver)
 {
     <form id="enemyTurnForm" asp-action="EnemyTurn" method="post" class="d-none">
         @Html.AntiForgeryToken()
     </form>
-
     <form id="resolveEnemyForm" asp-action="ResolveEnemyAttack" method="post" class="d-none">
         @Html.AntiForgeryToken()
     </form>
@@ -128,33 +143,16 @@
             if (!bar) return Promise.resolve();
 
             const target = Number(bar.dataset.target);
-            bar.style.transition = "width 900ms linear";
+            bar.style.transition = "width 900ms ease-out";
 
             return new Promise(resolve => {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        bar.style.width = `${target}%`;
+                        bar.style.width = target + "%";
                     });
                 });
-
                 window.setTimeout(resolve, 950);
             });
-        }
-
-        async function runBattleSequence() {
-            await animateHealthBar(enemyBar);
-
-            const enemyTurnForm = document.getElementById("enemyTurnForm");
-            const resolveEnemyForm = document.getElementById("resolveEnemyForm");
-
-            if (enemyTurnForm) {
-                enemyTurnForm.requestSubmit();
-                return;
-            }
-
-            if (resolveEnemyForm) {
-                resolveEnemyForm.requestSubmit();
-            }
         }
 
         const enemyTurnPending = @Model.EnemyTurnPending.ToString().ToLower();
@@ -163,10 +161,13 @@
         if (enemyAttackPending) {
             window.setTimeout(() => {
                 document.getElementById("resolveEnemyForm")?.requestSubmit();
-            }, 1000);
+            }, 850);
         } else if (enemyTurnPending) {
-            runBattleSequence();
+            animateHealthBar(enemyBar).then(() => {
+                document.getElementById("enemyTurnForm")?.requestSubmit();
+            });
         } else {
+            animateHealthBar(enemyBar);
             animateHealthBar(playerBar);
         }
     });
