@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Battle";
+    var currentQuestion = ViewBag.CurrentQuestion as EduGameMVC.Models.Question;
 }
 
 <main class="battle-page">
@@ -83,15 +84,37 @@
                 {
                     <small>Waiting for the monster...</small>
                 }
+                else if (!Model.QuestionAnswered)
+                {
+                    <small>Answer the question to continue. A wrong answer still lets you choose a move.</small>
+                }
                 else
                 {
                     <small>Choose a move.</small>
                 }
             </div>
 
+            @if (!Model.GameOver && !Model.EnemyTurnPending && !Model.EnemyAttackPending && !Model.QuestionAnswered && currentQuestion != null)
+            {
+                <div class="card p-3 mb-2">
+                    <h2 class="h5">@currentQuestion.QuestionText</h2>
+                    <form asp-action="Answer" method="post" class="d-grid gap-2">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-outline-primary" name="option" value="A">A. @currentQuestion.OptionA</button>
+                        <button class="btn btn-outline-primary" name="option" value="B">B. @currentQuestion.OptionB</button>
+                        <button class="btn btn-outline-primary" name="option" value="C">C. @currentQuestion.OptionC</button>
+                        <button class="btn btn-outline-primary" name="option" value="D">D. @currentQuestion.OptionD</button>
+                    </form>
+                </div>
+            }
+            else if (!Model.GameOver && currentQuestion == null)
+            {
+                <div class="alert alert-warning">No questions are available. Add questions to enable the quiz challenge.</div>
+            }
+
             @if (!Model.GameOver &&
                  !Model.EnemyTurnPending &&
-                 !Model.EnemyAttackPending)
+                 !Model.EnemyAttackPending && Model.QuestionAnswered)
             {
                 <form asp-action="Attack" method="post" class="card battle-move-menu">
                     @Html.AntiForgeryToken()

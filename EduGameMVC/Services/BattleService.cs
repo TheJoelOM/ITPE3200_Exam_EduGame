@@ -105,6 +105,19 @@ namespace EduGameMVC.Services
             game.SpecialPoints += amount;
         }
 
+        public int AwardCorrectAnswer(GameState game, string difficulty)
+        {
+            var reward = difficulty switch
+            {
+                "Easy" => 4,
+                "Medium" => 6,
+                "Hard" => 8,
+                _ => 0
+            };
+            AwardSpecialPoints(game, reward);
+            return reward;
+        }
+
         private static bool CanPlayerAct(GameState game)
         {
             return !game.GameOver

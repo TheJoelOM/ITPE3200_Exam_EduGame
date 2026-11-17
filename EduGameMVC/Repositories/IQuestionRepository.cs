@@ -6,6 +6,7 @@ namespace EduGameMVC.Repositories
     {
         Task<List<Question>> GetAllAsync();
         Task<Question?> GetByIdAsync(int id);
+        Task<Question?> GetRandomAsync();
         Task AddAsync(Question question);
         Task UpdateAsync(Question question);
         Task DeleteAsync(int id);

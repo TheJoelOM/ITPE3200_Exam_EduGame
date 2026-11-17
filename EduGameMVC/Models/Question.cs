@@ -23,12 +23,14 @@ namespace EduGameMVC.Models
         public string OptionD { get; set; } = string.Empty;
 
         [Required]
+        [RegularExpression("^[ABCD]$", ErrorMessage = "Choose A, B, C, or D.")]
         public string CorrectOption { get; set; } = string.Empty;
 
         [Required]
         public string Subject { get; set; } = string.Empty;
 
         [Required]
+        [RegularExpression("^(Easy|Medium|Hard)$", ErrorMessage = "Choose Easy, Medium, or Hard.")]
         public string Difficulty { get; set; } = string.Empty;
     }
 }

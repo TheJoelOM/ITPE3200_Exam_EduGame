@@ -23,6 +23,12 @@ namespace EduGameMVC.Repositories
             return await _context.Questions.FindAsync(id);
         }
 
+        public async Task<Question?> GetRandomAsync()
+        {
+            var questions = await _context.Questions.ToListAsync();
+            return questions.Count == 0 ? null : questions[Random.Shared.Next(questions.Count)];
+        }
+
         public async Task AddAsync(Question question)
         {
             await _context.Questions.AddAsync(question);

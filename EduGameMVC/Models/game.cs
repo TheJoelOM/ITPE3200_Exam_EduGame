@@ -5,6 +5,9 @@ namespace EduGameMVC.Models
         public int PlayerHealth { get; set; } = 100;
         public int EnemyHealth { get; set; } = 100;
         public int SpecialPoints { get; set; } = 0;
+        public int? CurrentQuestionId { get; set; }
+        public bool QuestionAnswered { get; set; }
+        public bool LastAnswerWasCorrect { get; set; }
 
         public bool PlayerTurn { get; set; } = true;
         public bool GameOver { get; set; } = false;
