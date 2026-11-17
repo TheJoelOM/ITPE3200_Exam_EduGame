@@ -3,6 +3,8 @@ using EduGameMVC.Models;
 using EduGameMVC.Repositories;
 using EduGameMVC.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace EduGameMVC.Controllers
 {
@@ -30,17 +32,51 @@ namespace EduGameMVC.Controllers
 
             if (game.CurrentQuestionId == null && !game.GameOver && !game.EnemyTurnPending)
             {
-                var question = await _questionRepository.GetRandomAsync();
+                var mode = HttpContext.Session.GetString("AdventureMode") ?? "Datasikkerhet";
+                var subject = mode == "Custom" ? HttpContext.Session.GetString("AdventureSubject") : "Datasikkerhet";
+                var ownerId = mode == "Custom" ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
+                game.AdventureMode = mode;
+                game.AdventureSubject = subject;
+                game.AdventureOwnerId = ownerId;
+                var question = subject == null ? null : await _questionRepository.GetRandomForAdventureAsync(subject, ownerId, mode != "Custom");
                 game.CurrentQuestionId = question?.Id;
                 game.QuestionAnswered = question == null;
                 SaveGame(game);
             }
 
-            ViewBag.CurrentQuestion = game.CurrentQuestionId is int questionId
+            var currentQuestion = game.CurrentQuestionId is int questionId
                 ? await _questionRepository.GetByIdAsync(questionId)
                 : null;
+            if (currentQuestion != null && !QuestionBelongsToAdventure(currentQuestion, game))
+            {
+                game.CurrentQuestionId = null;
+                game.QuestionAnswered = false;
+                SaveGame(game);
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.CurrentQuestion = currentQuestion;
 
             return View(game);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> StartCustom(string subject)
+        {
+            var ownerId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            if (!(await _questionRepository.GetSubjectsForOwnerAsync(ownerId)).Contains(subject))
+                return Forbid();
+            HttpContext.Session.SetString("AdventureMode", "Custom");
+            HttpContext.Session.SetString("AdventureSubject", subject);
+            SaveGame(_battleService.StartBattle());
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult StartDatasikkerhet()
+        {
+            HttpContext.Session.SetString("AdventureMode", "Datasikkerhet");
+            HttpContext.Session.Remove("AdventureSubject");
+            SaveGame(_battleService.StartBattle());
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -52,7 +88,7 @@ namespace EduGameMVC.Controllers
                 return RedirectToAction(nameof(Index));
 
             var question = await _questionRepository.GetByIdAsync(game.CurrentQuestionId.Value);
-            if (question == null)
+            if (question == null || !QuestionBelongsToAdventure(question, game))
                 return RedirectToAction(nameof(Index));
 
             game.LastAnswerWasCorrect = string.Equals(option, question.CorrectOption, StringComparison.OrdinalIgnoreCase);
@@ -196,5 +232,10 @@ namespace EduGameMVC.Controllers
                 GameSessionKey,
                 JsonSerializer.Serialize(game));
         }
+
+        private bool QuestionBelongsToAdventure(Question question, GameState game) =>
+            game.AdventureMode == "Custom"
+                ? question.OwnerId == game.AdventureOwnerId && question.Subject == game.AdventureSubject
+                : question.OwnerId == null && question.Subject == "Datasikkerhet";
     }
 }

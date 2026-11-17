@@ -6,6 +6,9 @@ namespace EduGameMVC.Models
     {
         public int Id { get; set; }
 
+        // Null means shared content managed by an administrator.
+        public string? OwnerId { get; set; }
+
         [Required]
         [StringLength(250)]
         public string QuestionText { get; set; } = string.Empty;

@@ -1,0 +1,18 @@
+@model IEnumerable<string>
+@{ ViewData["Title"] = "Choose a subject"; }
+<h1>Choose your subject</h1>
+<p>Only subjects from your own questions are shown here.</p>
+@if (!Model.Any())
+{
+    <p>You have no subjects yet. Add questions first.</p>
+    <a asp-controller="Questions" asp-action="Create" class="btn btn-primary">Create a question</a>
+}
+else
+{
+    <div class="list-group">
+    @foreach (var subject in Model)
+    {
+        <a class="list-group-item list-group-item-action" asp-controller="Game" asp-action="StartCustom" asp-route-subject="@subject">@subject →</a>
+    }
+    </div>
+}

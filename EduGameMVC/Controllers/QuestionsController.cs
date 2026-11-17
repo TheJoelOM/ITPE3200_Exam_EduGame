@@ -1,6 +1,8 @@
 using EduGameMVC.Models;
 using EduGameMVC.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace EduGameMVC.Controllers
 {
@@ -18,18 +20,21 @@ namespace EduGameMVC.Controllers
         }
 
         // READ lists the questions
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            var questions = await _questionRepository.GetAllAsync();
+            var all = await _questionRepository.GetAllAsync();
+            var questions = User.IsInRole("Admin") ? all : all.Where(q => q.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier));
             return View(questions);
         }
 
         // READ shows one question
+        [Authorize]
         public async Task<IActionResult> Details(int id)
         {
             var question = await _questionRepository.GetByIdAsync(id);
 
-            if (question == null)
+            if (question == null || !CanAccess(question))
             {
                 _logger.LogWarning(
                     "Question with id {QuestionId} was not found.",
@@ -42,6 +47,7 @@ namespace EduGameMVC.Controllers
         }
 
         // CREATE show form
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -50,6 +56,7 @@ namespace EduGameMVC.Controllers
         // CREATE process form
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create(Question question)
         {
             if (!ModelState.IsValid)
@@ -57,6 +64,8 @@ namespace EduGameMVC.Controllers
                 return View(question);
             }
 
+            question.OwnerId = User.IsInRole("Admin") && question.Subject == "Datasikkerhet"
+                ? null : User.FindFirstValue(ClaimTypes.NameIdentifier);
             await _questionRepository.AddAsync(question);
 
             _logger.LogInformation(
@@ -67,11 +76,12 @@ namespace EduGameMVC.Controllers
         }
 
         // UPDATE show edit form
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var question = await _questionRepository.GetByIdAsync(id);
 
-            if (question == null)
+            if (question == null || !CanManage(question))
             {
                 _logger.LogWarning(
                     "Question with id {QuestionId} was not found for editing.",
@@ -86,12 +96,17 @@ namespace EduGameMVC.Controllers
         // UPDATE process edit
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, Question question)
         {
             if (id != question.Id)
             {
                 return BadRequest();
             }
+
+            var existing = await _questionRepository.GetByIdAsync(id);
+            if (existing == null || !CanManage(existing)) return NotFound();
+            question.OwnerId = existing.OwnerId;
 
             if (!ModelState.IsValid)
             {
@@ -124,11 +139,12 @@ namespace EduGameMVC.Controllers
         }
 
         // DELETE confirmation page
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var question = await _questionRepository.GetByIdAsync(id);
 
-            if (question == null)
+            if (question == null || !CanManage(question))
             {
                 _logger.LogWarning(
                     "Question with id {QuestionId} was not found for deletion.",
@@ -143,11 +159,12 @@ namespace EduGameMVC.Controllers
         // DELETE this will delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var question = await _questionRepository.GetByIdAsync(id);
 
-            if (question == null)
+            if (question == null || !CanManage(question))
             {
                 return NotFound();
             }
@@ -160,5 +177,8 @@ namespace EduGameMVC.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        private bool CanAccess(Question question) => CanManage(question) || question.OwnerId == null;
+        private bool CanManage(Question question) => User.IsInRole("Admin") || question.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 }
