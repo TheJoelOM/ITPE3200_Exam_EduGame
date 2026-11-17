@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sidra\\turnbasedgame\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj": {}
+    "c:\\Users\\joel_\\Desktop\\Itpe3200_Exam Group Project\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sidra\\turnbasedgame\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj": {
+    "c:\\Users\\joel_\\Desktop\\Itpe3200_Exam Group Project\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sidra\\turnbasedgame\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj",
+        "projectUniqueName": "c:\\Users\\joel_\\Desktop\\Itpe3200_Exam Group Project\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj",
         "projectName": "EduGameAPI",
-        "projectPath": "C:\\Users\\sidra\\turnbasedgame\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj",
-        "packagesPath": "C:\\Users\\sidra\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sidra\\turnbasedgame\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\obj\\",
+        "projectPath": "c:\\Users\\joel_\\Desktop\\Itpe3200_Exam Group Project\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\EduGameAPI.csproj",
+        "packagesPath": "C:\\Users\\joel_\\.nuget\\packages\\",
+        "outputPath": "c:\\Users\\joel_\\Desktop\\Itpe3200_Exam Group Project\\ITPE3200_Exam_EduGame\\EduGame-Api-SHA\\EduGameAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\sidra\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\joel_\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -84,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
