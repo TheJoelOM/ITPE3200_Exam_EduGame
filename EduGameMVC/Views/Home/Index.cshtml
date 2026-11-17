@@ -1,8 +1,25 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@{
+    ViewData["Title"] = "EduGame Adventure";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<main class="adventure-home">
+    <p class="eyebrow">EDUGAME · LEARN BY PLAYING</p>
+    <h1>Choose your adventure</h1>
+    <p class="home-intro">Answer questions, earn special points, and use them to win the battle.</p>
+    <div class="adventure-options">
+        <a class="adventure-card customizable" asp-controller="Adventure" asp-action="Custom">
+            <span class="adventure-tag">YOUR QUESTIONS</span>
+            <h2>Customizable – Adventure</h2>
+            <p>Sign in and choose a subject from your own question collection.</p>
+            <span class="adventure-cta">@(SignInManager.IsSignedIn(User) ? "Choose a subject →" : "Sign in to begin →")</span>
+        </a>
+        <a class="adventure-card datasikkerhet" asp-controller="Adventure" asp-action="Datasikkerhet">
+            <span class="adventure-tag">STANDARD ADVENTURE</span>
+            <h2>Datasikkerhet – Adventure</h2>
+            <p>Play the shared adventure with questions about datasikkerhet.</p>
+            <span class="adventure-cta">Start adventure →</span>
+        </a>
+    </div>
+</main>

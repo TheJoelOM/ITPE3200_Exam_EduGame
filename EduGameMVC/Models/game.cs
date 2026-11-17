@@ -8,6 +8,9 @@ namespace EduGameMVC.Models
         public int? CurrentQuestionId { get; set; }
         public bool QuestionAnswered { get; set; }
         public bool LastAnswerWasCorrect { get; set; }
+        public string AdventureMode { get; set; } = "Datasikkerhet";
+        public string? AdventureSubject { get; set; }
+        public string? AdventureOwnerId { get; set; }
 
         public bool PlayerTurn { get; set; } = true;
         public bool GameOver { get; set; } = false;

@@ -23,11 +23,16 @@ namespace EduGameMVC.Repositories
             return await _context.Questions.FindAsync(id);
         }
 
-        public async Task<Question?> GetRandomAsync()
+        public async Task<Question?> GetRandomForAdventureAsync(string subject, string? ownerId, bool shared)
         {
-            var questions = await _context.Questions.ToListAsync();
+            var query = _context.Questions.Where(q => q.Subject == subject);
+            query = shared ? query.Where(q => q.OwnerId == null) : query.Where(q => q.OwnerId == ownerId);
+            var questions = await query.ToListAsync();
             return questions.Count == 0 ? null : questions[Random.Shared.Next(questions.Count)];
         }
+
+        public Task<List<string>> GetSubjectsForOwnerAsync(string ownerId) =>
+            _context.Questions.Where(q => q.OwnerId == ownerId).Select(q => q.Subject).Distinct().OrderBy(s => s).ToListAsync();
 
         public async Task AddAsync(Question question)
         {
