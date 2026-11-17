@@ -1,0 +1,6 @@
+@EduGameAPI_HostAddress = http://localhost:5029
+
+GET {{EduGameAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

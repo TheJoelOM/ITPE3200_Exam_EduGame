@@ -487,3 +487,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+EduGameMVC/EduGame.db-wal
+EduGameMVC/EduGame.db-shm
+EduGameMVC/EduGame.db-shm-journal
